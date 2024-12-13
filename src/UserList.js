@@ -1,79 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 
-const UserList = () => {
-    const [users, setUsers] = useState([]);
-    const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+function UserList() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    const fetchData = () => {
-        setLoading(true);
-        setError(null);
-        // Fetch users
-        fetch('https://jsonplaceholder.typicode.com/users')
-            .then(response => response.json())
-            .then(data => {
-                setUsers(data);
-                setLoading(false);
-            })
-            .catch(error => {
-                setError('Failed to fetch users.');
-                setLoading(false);
-            });
-        // Fetch posts
-        fetch('https://jsonplaceholder.typicode.com/posts')
-            .then(response => response.json())
-            .then(data => setPosts(data))
-            .catch(error => {
-                setError('Failed to fetch posts.');
-                setLoading(false);
-            });
-    };
+  useEffect(() => {
+    fetch('https://jsonplaceholder.typicode.com/users')
+      .then((response) => response.json())
+      .then((data) => {
+        setUsers(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching user data:', error);
+        setLoading(false);
+      });
+  }, []);
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-    const getPostsByUserId = (userId) => {
-        return posts.filter(post => post.userId === userId);
-    };
-
-    return (
-        <div>
-            {loading ? (
-                <p>Loading...</p>
-            ) : error ? (
-                <div>
-                    <p>{error}</p>
-                    <button onClick={fetchData}>Retry</button>
-                </div>
-            ) : (
-                <div>
-                    <h2>Users</h2>
-                    <ul>
-                        {users.map(user => (
-                            <li key={user.id}>
-                                <h3>
-                                    <Link to={`/user/${user.id}`}>{user.name}</Link>
-                                </h3>
-                                <p>Email: {user.email}</p>
-                                <h4>Posts:</h4>
-                                <ul>
-                                    {getPostsByUserId(user.id).map(post => (
-                                        <li key={post.id}>
-                                            <strong>{post.title}</strong>
-                                            <p>{post.body}</p>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-        </div>
-    );
-};
+  return (
+    <div>
+      <h1>User List</h1>
+      <ul>
+        {users.map((user) => (
+          <li key={user.id}>
+            <p>Name: {user.name}</p>
+            <p>Email: {user.email}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export default UserList;
