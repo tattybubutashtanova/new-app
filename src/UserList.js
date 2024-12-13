@@ -1,13 +1,16 @@
+import './UserList.css';
 import React, { useState, useEffect } from 'react';
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
+    const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const fetchData = () => {
         setLoading(true);
         setError(null);
+        // Fetch users
         fetch('https://jsonplaceholder.typicode.com/users')
             .then(response => response.json())
             .then(data => {
@@ -15,7 +18,15 @@ const UserList = () => {
                 setLoading(false);
             })
             .catch(error => {
-                setError('Failed to fetch data. Please try again.');
+                setError('Failed to fetch users.');
+                setLoading(false);
+            });
+        // Fetch posts
+        fetch('https://jsonplaceholder.typicode.com/posts')
+            .then(response => response.json())
+            .then(data => setPosts(data))
+            .catch(error => {
+                setError('Failed to fetch posts.');
                 setLoading(false);
             });
     };
@@ -23,6 +34,10 @@ const UserList = () => {
     useEffect(() => {
         fetchData();
     }, []);
+
+    const getPostsByUserId = (userId) => {
+        return posts.filter(post => post.userId === userId);
+    };
 
     return (
         <div>
@@ -34,14 +49,26 @@ const UserList = () => {
                     <button onClick={fetchData}>Retry</button>
                 </div>
             ) : (
-                <ul>
-                    {users.map(user => (
-                        <li key={user.id}>
-                            <p>Name: {user.name}</p>
-                            <p>Email: {user.email}</p>
-                        </li>
-                    ))}
-                </ul>
+                <div>
+                    <h2>Users</h2>
+                    <ul>
+                        {users.map(user => (
+                            <li key={user.id}>
+                                <h3>{user.name}</h3>
+                                <p>Email: {user.email}</p>
+                                <h4>Posts:</h4>
+                                <ul>
+                                    {getPostsByUserId(user.id).map(post => (
+                                        <li key={post.id}>
+                                            <strong>{post.title}</strong>
+                                            <p>{post.body}</p>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             )}
         </div>
     );
