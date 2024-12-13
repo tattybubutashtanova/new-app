@@ -1,5 +1,5 @@
-import './UserList.css';
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
@@ -54,7 +54,9 @@ const UserList = () => {
                     <ul>
                         {users.map(user => (
                             <li key={user.id}>
-                                <h3>{user.name}</h3>
+                                <h3>
+                                    <Link to={`/user/${user.id}`}>{user.name}</Link>
+                                </h3>
                                 <p>Email: {user.email}</p>
                                 <h4>Posts:</h4>
                                 <ul>
